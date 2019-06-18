@@ -52,33 +52,47 @@ const prompt = filename =>
 		draw(active, filename);
 
 		process.stdin.on('keypress', function(ch, key) {
-			if (key && key.name === 'down') {
-				if (active >= choices.length - 1) {
-					active = 0;
-				} else {
-					active += 1;
-				}
-				draw(active, filename);
+			if (!key) {
+				return;
 			}
-			if (key && key.name === 'up') {
-				if (active <= 0) {
-					active = choices.length - 1;
-				} else {
-					active -= 1;
-				}
-				draw(active, filename);
-			}
-			if (key && key.name === 'return') {
-				process.stdin.setRawMode(false);
-				process.stdout.write('\033c');
-				if (active === 0) {
-					yay();
-				} else {
-					process.exit();
-				}
-			}
-			if (key && key.ctrl && key.name == 'c') {
-				process.stdin.setRawMode(false);
+
+			// <up> / <down> to select an option
+			// <return> to confirm a selection
+			// <ctrl> + <c> for le exit
+			switch (key) {
+				case "down":
+					if (active >= choices.length - 1) {
+						active = 0;
+					} else {
+						active += 1;
+					}
+					draw(active, filename);
+					break;
+
+				case "up":
+					if (active <= 0) {
+						active = choices.length - 1;
+					} else {
+						active -= 1;
+					}
+					draw(active, filename);
+					break;
+
+				case "return":
+					process.stdin.setRawMode(false);
+					process.stdout.write("\033c");
+					if (active === 0) {
+						yay();
+					} else {
+						process.exit();
+					}
+					break;
+
+				// le CTRL + C
+				case "c":
+					if (key.ctrl) {
+						process.stdin.setRawMode(false);
+					}
 			}
 		});
 
